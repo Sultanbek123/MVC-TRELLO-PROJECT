@@ -1,0 +1,162 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/main.html">
+    <div class="row" layout:fragment="detailsPage">
+        <div class="card">
+            <h4 class="card-title" th:text="${folder.getName()}"></h4>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2" th:each="category : ${folder.getCategories()}">
+                        <div class="input-group">
+                            <a class="btn btn-primary" th:text="${category.getName()}" style="width: 150px"></a>
+                            <button class="btn btn-primary" data-bs-toggle='modal' th:attr="data-bs-target='#modalThree' + ${category.getId()}">x</button>
+                        </div>
+                        <div class="modal fade" th:attr="id='modalThree' + ${category.getId()}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel1" aria-hidden="true">
+                            <form th:action="@{'/trello/delete-category-from-folder-details'}" method="post">
+                                <div class="modal-dialog modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="staticBackdropLabel1">REMOVE CATEGORY</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h3>Do you want to remove category?</h3>
+                                            <input type="hidden" th:value="${folder.getId()}" name="folder-id">
+                                            <input type="hidden" th:value="${category.getId()}" name="category-id">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                                            <button class="btn btn-danger">REMOVE</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalTwo">+Add Category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <button class="btn btn-light" style="width: 150px" data-bs-toggle="modal" data-bs-target="#modalFour">+New Task</button>
+        </div>
+        <div class="row">
+            <div class="col-md-1">
+                <strong><h4>id</h4></strong>
+            </div>
+            <div class="col-md-8">
+                <strong><h4>Task Name</h4></strong>
+            </div>
+            <div class="col-md-1">
+                <strong><h4>Status</h4></strong>
+            </div>
+            <div class="col-md-2">
+                <strong><h4>Details</h4></strong>
+            </div>
+        </div>
+        <div class="row" th:each="task : ${tasks}">
+            <div class="col-md-1">
+                <h4 th:text="${task.getId()}"></h4>
+            </div>
+            <div class="col-md-8">
+                <h4 th:text="${task.getTitle()}"></h4>
+            </div>
+            <div class="col-md-1">
+                <h4 th:class="${task.getStatus() == 0?'text-primary':(task.getStatus() == 1?'text-warning':(task.getStatus() == 2?'text-success' : 'text-danger'))}" th:text="${task.getStatus() == 0?'TO DO':(task.getStatus() == 1?'INTEST':(task.getStatus() == 2?'DONE':'FAILED'))}"></h4>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" data-bs-toggle='modal' th:attr="data-bs-target='#modalFive' + ${task.getId()}">View More</button>
+            </div>
+            <div class="modal fade" th:attr="id='modalFive' + ${task.getId()}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel5" aria-hidden="true">
+                <form th:action="@{''}" method="post">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel5">REMOVE CATEGORY</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" th:value="${task.getId()}">
+                                <div class="form-group">
+                                    <label class="form-label">TITLE:</label>
+                                    <input type="text" class="form-control" name="task-title">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">DESCRIPTION:</label>
+                                    <input type="text" class="form-control" name="task-description">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">STATUS:</label>
+                                    <select class="form-control" name="task-status">
+                                        <option th:value="0">TO DO</option>
+                                        <option th:value="1">IN TEST</option>
+                                        <option th:value="2">DONE</option>
+                                        <option th:value="3">FAILED</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                                <button class="btn btn-danger">EDIT</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div class="modal fade" id="modalFour" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+            <form th:action="@{'/trello/add-task'}" method="post">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel2">ADD TASK</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:value="${folder.getId()}" name="folder-id">
+                        <div class="form-group">
+                            <label class="form-label">TITLE:</label>
+                            <input type="text" class="form-control" name="task-title" placeholder="Title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">DESCRIPTION:</label>
+                            <textarea class="form-control" placeholder="Description" name="task-description"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                        <button class="btn btn-success">ADD</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+
+        <div class="modal fade" id="modalTwo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <form th:action="@{'/trello/assign-category'}" method="post">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">ASSIGN CATEGORY</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" th:value="${folder.getId()}" name="folder-id">
+                            <label class="form-label">CATEGORY NAME:</label>
+                            <select class="form-control" name="category-id">
+                                <option th:each="category : ${taskCategoriesList}" th:text="${category.getName()}" th:value="${category.getId()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                        <button class="btn btn-primary">ADD</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</html>
